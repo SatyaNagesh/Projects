@@ -1,1 +1,36 @@
+# Quiz Game 🎯
 
+A simple and interactive quiz application built using HTML, CSS and JavaScript.
+
+The app allows users to answer multiple-choice questions, track scores, compete on a leaderboard, and test themselves with different categories and difficulty levels.
+
+---
+
+## Features
+
+- Multiple-choice quiz system
+- Timer for every question
+- Categories selection
+- Difficulty modes
+- Score tracking
+- Progress bar
+- Leaderboard using Local Storage
+- Responsive design
+
+---
+
+## Built With
+
+- HTML
+- CSS
+- JavaScript
+
+---
+
+## Files
+
+```bash
+index.html
+style.css
+script.js
+README.md
