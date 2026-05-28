@@ -1,1 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Finder</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
 
+    <div class="app">
+
+        <header class="header">
+            <h1 class="logo">🍳 Recipe Finder</h1>
+            <p class="tagline">Discover meals from around the world</p>
+        </header>
+
+        <div class="search-section">
+            <div class="search-box">
+                <input
+                    type="text"
+                    id="search-input"
+                    placeholder="Search for a recipe (e.g. pasta, chicken, soup)..."
+                    autocomplete="off"
+                >
+                <button id="search-btn">Search</button>
+            </div>
+
+            <div class="category-strip" id="category-strip">
+                <button class="cat-btn active" data-cat="">All</button>
+                <button class="cat-btn" data-cat="Beef">Beef</button>
+                <button class="cat-btn" data-cat="Chicken">Chicken</button>
+                <button class="cat-btn" data-cat="Seafood">Seafood</button>
+                <button class="cat-btn" data-cat="Vegetarian">Vegetarian</button>
+                <button class="cat-btn" data-cat="Pasta">Pasta</button>
+                <button class="cat-btn" data-cat="Dessert">Dessert</button>
+                <button class="cat-btn" data-cat="Breakfast">Breakfast</button>
+                <button class="cat-btn" data-cat="Lamb">Lamb</button>
+                <button class="cat-btn" data-cat="Pork">Pork</button>
+            </div>
+        </div>
+
+        <div id="loading-state" class="state-box hidden">
+            <div class="loader">
+                <span>🍽</span>
+            </div>
+            <p>Finding delicious recipes...</p>
+        </div>
+
+        <div id="error-state" class="state-box hidden">
+            <p class="state-emoji">🔍</p>
+            <p id="error-text">No recipes found. Try a different search.</p>
+        </div>
+
+        <div id="results-section" class="results-section hidden">
+            <p class="results-count" id="results-count"></p>
+            <div class="results-grid" id="results-grid"></div>
+        </div>
+
+        <!-- MODAL -->
+        <div class="modal-backdrop hidden" id="modal-backdrop">
+            <div class="modal" id="modal">
+                <button class="modal-close" id="modal-close">✕</button>
+                <div class="modal-content" id="modal-content"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
