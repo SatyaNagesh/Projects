@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="noise"></div>
+    <div class="bg-glow" id="bg-glow"></div>
+
+    <div class="app">
+
+        <header class="header">
+            <span class="header-label">WEATHER</span>
+            <div class="search-wrap">
+                <input type="text" id="city-input" placeholder="Enter city..." autocomplete="off" spellcheck="false">
+                <button id="search-btn" aria-label="Search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                </button>
+            </div>
+            <button class="locate-btn" id="locate-btn" title="Use my location">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+                    <circle cx="12" cy="12" r="8" stroke-dasharray="2 2"/>
+                </svg>
+                Use my location
+            </button>
+        </header>
+
+        <div id="error-state" class="state-box hidden">
+            <p class="state-icon">⚡</p>
+            <p id="error-text">City not found.</p>
+        </div>
+
+        <div id="loading-state" class="state-box hidden">
+            <div class="pulse-ring"></div>
+            <p class="mono">Fetching weather data...</p>
+        </div>
+
+        <div id="empty-state" class="state-box">
+            <p class="empty-icon">🌐</p>
+            <p class="mono">Search a city to begin</p>
+        </div>
+
+        <div id="weather-main" class="weather-main hidden">
+
+            <div class="city-row">
+                <div>
+                    <h1 class="city-name" id="city-name">—</h1>
+                    <p class="city-country mono" id="city-country">—</p>
+                </div>
+                <p class="local-time mono" id="local-time">—</p>
+            </div>
+
+            <div class="hero-row">
+                <div class="temp-block">
+                    <span class="big-temp" id="big-temp">—</span>
+                    <span class="temp-unit">°C</span>
+                </div>
+                <div class="condition-block">
+                    <div class="weather-icon" id="weather-icon">🌤</div>
+                    <p class="condition-text" id="condition-text">—</p>
+                    <p class="feels-like mono" id="feels-like">Feels like —°</p>
+                </div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <span class="stat-icon">💧</span>
+                    <span class="stat-val" id="humidity">—</span>
+                    <span class="stat-label mono">Humidity</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🌬</span>
+                    <span class="stat-val" id="wind">—</span>
+                    <span class="stat-label mono">Wind</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">👁</span>
+                    <span class="stat-val" id="visibility">—</span>
+                    <span class="stat-label mono">Visibility</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">☔</span>
+                    <span class="stat-val" id="precipitation">—</span>
+                    <span class="stat-label mono">Rain</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🌅</span>
+                    <span class="stat-val" id="sunrise">—</span>
+                    <span class="stat-label mono">Sunrise</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🌇</span>
+                    <span class="stat-val" id="sunset">—</span>
+                    <span class="stat-label mono">Sunset</span>
+                </div>
+            </div>
+
+            <div class="forecast-section">
+                <p class="section-label mono">7-DAY FORECAST</p>
+                <div class="forecast-row" id="forecast-row"></div>
+            </div>
+
+            <div class="hourly-section">
+                <p class="section-label mono">24-HOUR VIEW</p>
+                <div class="hourly-row" id="hourly-row"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
