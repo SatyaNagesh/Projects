@@ -158,75 +158,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return contrastWithWhite > contrastWithBlack ? '#FFFFFF' : '#000000';
     }
 
-    // --- Dynamic Palette Harmonies Engine ---
-    function calculateHarmonies(baseHex, type, count) {
-        const baseHsl = hexToHsl(baseHex);
-        const colorsList = [];
-        const safeS = Math.max(40, baseHsl.s);
-        const safeL = Math.max(25, Math.min(75, baseHsl.l));
-
-        switch (type) {
-            case 'complementary': {
-                const hues = [baseHsl.h, (baseHsl.h + 180) % 360];
-                for (let i = 0; i < count; i++) {
-                    const h = hues[i % 2];
-                    const s = Math.max(30, safeS - (i * 8));
-                    const l = Math.max(20, Math.min(80, safeL + (i < 2 ? 0 : (i === 2 ? -15 : i === 3 ? 15 : -25))));
-                    colorsList.push(hslToHex(h, s, l));
-                }
-                break;
-            }
-            case 'analogous': {
-                const step = 25;
-                for (let i = 0; i < count; i++) {
-                    const offset = (i - Math.floor(count / 2)) * step + Math.round(Math.random() * 6 - 3);
-                    const h = (baseHsl.h + offset + 360) % 360;
-                    colorsList.push(hslToHex(h, safeS, safeL));
-                }
-                break;
-            }
-            case 'triadic': {
-                const hues = [baseHsl.h, (baseHsl.h + 120) % 360, (baseHsl.h + 240) % 360];
-                for (let i = 0; i < count; i++) {
-                    const h = hues[i % 3];
-                    const s = Math.max(30, safeS - (i * 5));
-                    const l = Math.max(20, Math.min(80, safeL + (i < 2 ? 0 : (i === 2 ? -15 : i === 3 ? 12 : -20))));
-                    colorsList.push(hslToHex(h, s, l));
-                }
-                break;
-            }
-            case 'split': {
-                const hues = [baseHsl.h, (baseHsl.h + 150) % 360, (baseHsl.h + 210) % 360];
-                for (let i = 0; i < count; i++) {
-                    const h = hues[i % 3];
-                    const s = Math.max(30, safeS - (i * 5));
-                    const l = Math.max(20, Math.min(80, safeL + (i < 2 ? 0 : (i === 2 ? 18 : i === 3 ? -15 : -22))));
-                    colorsList.push(hslToHex(h, s, l));
-                }
-                break;
-            }
-            case 'monochromatic': {
-                for (let i = 0; i < count; i++) {
-                    const l = Math.round(15 + (i * (65 / Math.max(count - 1, 1))));
-                    const s = Math.max(30, safeS - (i * 6));
-                    colorsList.push(hslToHex(baseHsl.h, s, l));
-                }
-                break;
-            }
-            case 'random':
-            default: {
-                for (let i = 0; i < count; i++) {
-                    colorsList.push(generateRandomHex());
-                }
-                break;
-            }
-        }
-        return colorsList;
-    }
-
     // --- Core State Mutators ---
+    let lastHexes = '';
+
     function initializePalette() {
-        // Build 5 default starting colors using the selected harmony
         palette = [
             { hex: '#1E293B', locked: false, id: 'color-1' },
             { hex: '#4F46E5', locked: false, id: 'color-2' },
@@ -239,23 +174,80 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function generatePalette() {
         const harmony = harmonySelector.value;
-        
-        let anchorHex;
+        const count = palette.length;
+
+        let anchorHsl;
         const firstLocked = palette.find(c => c.locked);
         if (firstLocked) {
-            anchorHex = firstLocked.hex;
+            anchorHsl = hexToHsl(firstLocked.hex);
         } else {
-            anchorHex = harmony === 'random' ? generateRandomHex() : generateVividHex();
+            anchorHsl = hexToHsl(generateRandomHex());
+            let tries = 0;
+            while (anchorHsl.s < 35 && tries < 10) {
+                anchorHsl = hexToHsl(generateRandomHex());
+                tries++;
+            }
+        }
+        const baseH = anchorHsl.h;
+        const baseS = Math.max(50, anchorHsl.s);
+        const baseL = Math.max(35, Math.min(65, anchorHsl.l));
+
+        const newHexes = [];
+
+        if (harmony === 'random') {
+            for (let i = 0; i < count; i++) {
+                newHexes.push(generateRandomHex());
+            }
+        } else if (harmony === 'analogous') {
+            for (let i = 0; i < count; i++) {
+                const offset = (i - Math.floor(count / 2)) * 25;
+                const h = (baseH + offset + 360) % 360;
+                newHexes.push(hslToHex(h, baseS, baseL));
+            }
+        } else if (harmony === 'complementary') {
+            const hues = [baseH, (baseH + 180) % 360];
+            for (let i = 0; i < count; i++) {
+                const h = hues[i % 2];
+                const offL = [0, 0, -18, 18, -25][i] || 0;
+                const offS = -(i * 7);
+                newHexes.push(hslToHex(h, Math.max(25, baseS + offS), Math.max(18, Math.min(82, baseL + offL))));
+            }
+        } else if (harmony === 'triadic') {
+            const hues = [baseH, (baseH + 120) % 360, (baseH + 240) % 360];
+            for (let i = 0; i < count; i++) {
+                const h = hues[i % 3];
+                const offL = [0, 0, -18, 15, -22][i] || 0;
+                const offS = -(i * 6);
+                newHexes.push(hslToHex(h, Math.max(25, baseS + offS), Math.max(18, Math.min(82, baseL + offL))));
+            }
+        } else if (harmony === 'split') {
+            const hues = [baseH, (baseH + 150) % 360, (baseH + 210) % 360];
+            for (let i = 0; i < count; i++) {
+                const h = hues[i % 3];
+                const offL = [0, 0, 18, -18, -24][i] || 0;
+                const offS = -(i * 6);
+                newHexes.push(hslToHex(h, Math.max(25, baseS + offS), Math.max(18, Math.min(82, baseL + offL))));
+            }
+        } else if (harmony === 'monochromatic') {
+            for (let i = 0; i < count; i++) {
+                const lv = Math.round(12 + i * (70 / Math.max(count - 1, 1)));
+                newHexes.push(hslToHex(baseH, Math.max(30, baseS - i * 8), lv));
+            }
+        } else {
+            for (let i = 0; i < count; i++) {
+                newHexes.push(generateRandomHex());
+            }
         }
 
-        const calculatedColors = calculateHarmonies(anchorHex, harmony, palette.length);
-        
+        const hexStr = newHexes.join(',');
+        if (hexStr === lastHexes) {
+            newHexes[Math.floor(Math.random() * count)] = generateRandomHex();
+        }
+        lastHexes = hexStr;
+
         palette = palette.map((color, index) => {
             if (color.locked) return color;
-            return {
-                ...color,
-                hex: calculatedColors[index] || generateRandomHex()
-            };
+            return { ...color, hex: newHexes[index] || generateRandomHex() };
         });
 
         renderPalette();
