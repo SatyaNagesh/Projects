@@ -242,29 +242,36 @@ select:hover, select:focus {
 }
 
 .palette-grid {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 1px;
   padding: 20px;
-  min-height: 400px;
-  align-content: start;
+  min-height: 300px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
 }
 
 .color-card {
+  flex: 1;
   display: flex;
   flex-direction: column;
   position: relative;
-  padding: 20px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.3s ease;
+  padding: 16px;
+  transition: background-color 0.2s ease, opacity 0.3s ease;
   overflow: hidden;
-  min-height: 240px;
+  min-height: 260px;
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.color-card:last-child {
+  border-right: none;
 }
 
 .color-card:hover {
-  border-color: var(--border-hover);
+  flex: 1.2;
 }
 
 .color-card.dragging {
@@ -292,7 +299,7 @@ select:hover, select:focus {
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
   margin-top: auto;
 }
@@ -414,16 +421,17 @@ select:hover, select:focus {
 .card-actions {
   display: flex;
   flex-direction: row;
-  gap: 6px;
+  gap: 4px;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .action-icon-btn {
   background: rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 6px;
   display: flex;
   align-items: center;
