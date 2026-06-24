@@ -5,76 +5,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Game</title>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <div class="container">
+<div class="bg-curve" aria-hidden="true"></div>
 
-        <!-- START SCREEN -->
-        <div class="screen active" id="start-screen">
-            <h1>Quiz Time</h1>
-            <p>Let's test your knowledge with our quiz game</p>
-            <button id="start-btn">Start Quiz</button>
+<div class="container">
+
+    <div class="screen active" id="start-screen">
+        <div class="brand-icon">
+            <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v6l4 2"/>
+            </svg>
         </div>
+        <h1>Quiz Time</h1>
+        <p>Let's test your knowledge with our quiz game</p>
+        <button id="start-btn">Start Quiz</button>
+    </div>
 
-        <!-- QUIZ SCREEN -->
-        <div class="screen" id="quiz-screen">
+    <div class="screen" id="quiz-screen">
 
-            <div class="quiz-header">
-                <h2 id="question-text">Question</h2>
+        <div class="quiz-header">
+            <h2 id="question-text">Question</h2>
 
-                <div class="quiz-info">
-                    <p>
-                        Question
-                        <span id="current-question">1</span>
-                        of
-                        <span id="total-questions">5</span>
-                    </p>
-
-                    <p>
-                        Score:
-                        <span id="score">0</span>
-                    </p>
-                    <p id="timer">Time Left: <span id="time-left">15</span>s</p>
-                </div>
-            </div>
-
-            <div id="answers-container" class="answers-container"></div>
-
-            <div class="progress-bar">
-                <div id="progress" class="progress"></div>
-            </div>
-
-        </div>
-
-        <!-- RESULT SCREEN -->
-        <div id="result-screen" class="screen">
-
-            <h1>Quiz Results</h1>
-
-            <div class="result-info">
+            <div class="quiz-info">
                 <p>
-                    You scored
-                    <span id="final-score">0</span>
-                    out of
-                    <span id="max-score">5</span>
+                    Question
+                    <span id="current-question">1</span>
+                    of
+                    <span id="total-questions">5</span>
                 </p>
 
-                <div id="result-message">
-                    Good Job!
-                </div>
+                <p>
+                    Score:
+                    <span id="score">0</span>
+                </p>
+                <p id="timer">Time Left: <span id="time-left">15</span>s</p>
             </div>
+        </div>
 
-            <button id="restart-btn">Restart Quiz</button>
+        <div id="answers-container" class="answers-container"></div>
 
+        <div class="progress-bar">
+            <div id="progress" class="progress"></div>
         </div>
 
     </div>
 
-    <script src="script.js"></script>
+    <div id="result-screen" class="screen">
+
+        <div class="brand-icon">
+            <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M9 12l2 2 4-4M12 2a10 10 0 110 20 10 10 0 010-20z"/>
+            </svg>
+        </div>
+
+        <h1>Quiz Results</h1>
+
+        <div class="result-info">
+            <p>
+                You scored
+                <span id="final-score">0</span>
+                out of
+                <span id="max-score">5</span>
+            </p>
+
+            <div id="result-message">
+                Good Job!
+            </div>
+        </div>
+
+        <button id="restart-btn">Restart Quiz</button>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
 
 </body>
 

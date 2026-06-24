@@ -5,18 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChromaForge — Premium Color Palette Generator</title>
     <meta name="description" content="Generate beautiful, accessible, and professional color palettes using custom color harmonies. Preview in real-time, customize with HSL sliders, and export instantly.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
 <body>
 
-    <!-- Header Section -->
-    <header>
+<div class="bg-curve" aria-hidden="true"></div>
+
+<header>
+    <div class="header-inner">
         <div class="logo-container">
             <div class="logo-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.7255 3.09032 17.1962 4.85857 19" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-                    <path d="M12 6V12L16 14" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.7255 3.09032 17.1962 4.85857 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
             <div class="logo-text">
@@ -26,7 +31,6 @@
         </div>
 
         <div class="controls-container">
-            <!-- Harmony Dropdown Selector -->
             <div class="select-wrapper">
                 <select id="harmony-selector" title="Color Harmony Type">
                     <option value="random">Random Harmonies</option>
@@ -38,7 +42,6 @@
                 </select>
             </div>
 
-            <!-- Dynamic Actions -->
             <button id="add-color-btn" class="btn" title="Add a color to the palette (Max 10)">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 <span>Add Color</span>
@@ -59,131 +62,119 @@
                 <span>Export</span>
             </button>
         </div>
-    </header>
+    </div>
+</header>
 
-    <!-- Main Workspace Container -->
-    <main class="app-container">
-        <!-- Palette Generator Cards View -->
-        <div class="palette-viewer-container">
-            <div id="palette-grid" class="palette-grid">
-                <!-- Color cards are dynamically rendered here -->
-            </div>
-            <!-- Bottom Keyboard Shortcuts Hint -->
-            <div class="shortcuts-hint">
-                💡 Pro Tip: Press <span class="key-badge">Spacebar</span> to generate new palettes. Drag cards to reorder, or click hex values to write custom colors.
-            </div>
+<main class="app-container">
+    <div class="palette-viewer-container">
+        <div id="palette-grid" class="palette-grid"></div>
+        <div class="shortcuts-hint">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/>
+            </svg>
+            <span>Pro Tip: Press <span class="key-badge">Spacebar</span> to generate new palettes. Drag cards to reorder, or click hex values to write custom colors.</span>
         </div>
+    </div>
 
-        <!-- Sidebar (Dashboard Live Preview & Saved Library) -->
-        <aside class="sidebar-panel">
-            <!-- Dynamic Dashboard Preview -->
-            <section class="live-preview-box">
-                <h2 class="section-title">
-                    <span>Live UI Preview</span>
-                    <span>Component Canvas</span>
-                </h2>
-                <div class="preview-canvas" id="preview-canvas">
-                    <!-- Nav bar component mock -->
-                    <div class="p-header" id="p-header">
-                        <div class="p-header-title">
-                            <span class="p-logo-dot" id="p-logo-dot"></span>
-                            <span>SaaS Board</span>
-                        </div>
-                        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+    <aside class="sidebar-panel">
+        <section class="live-preview-box">
+            <h2 class="section-title">
+                <span>Live UI Preview</span>
+                <span>Component Canvas</span>
+            </h2>
+            <div class="preview-canvas" id="preview-canvas">
+                <div class="p-header" id="p-header">
+                    <div class="p-header-title">
+                        <span class="p-logo-dot" id="p-logo-dot"></span>
+                        <span>SaaS Board</span>
                     </div>
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                </div>
 
-                    <!-- Main Hero banner component mock -->
-                    <div class="p-hero" id="p-hero">
-                        <h3>Transform Your Workflow</h3>
-                        <p>Beautiful UI, tailored elements.</p>
+                <div class="p-hero" id="p-hero">
+                    <h3>Transform Your Workflow</h3>
+                    <p>Beautiful UI, tailored elements.</p>
+                </div>
+
+                <div class="p-buttons">
+                    <button class="p-btn-main" id="p-btn-main">Primary Button</button>
+                    <button class="p-btn-sec" id="p-btn-sec">Outline</button>
+                </div>
+
+                <div class="p-cards">
+                    <div class="p-card" id="p-card-1">
+                        <span class="p-tag" id="p-tag-1">New Feature</span>
+                        <span style="font-weight:700; font-size:0.75rem;">Analytics Hub</span>
+                        <span style="font-size:0.6rem; opacity:0.6;">Keep track of active leads.</span>
                     </div>
-
-                    <!-- Button interactions mock -->
-                    <div class="p-buttons">
-                        <button class="p-btn-main" id="p-btn-main">Primary Button</button>
-                        <button class="p-btn-sec" id="p-btn-sec">Outline</button>
-                    </div>
-
-                    <!-- Cards layout mock -->
-                    <div class="p-cards">
-                        <div class="p-card" id="p-card-1">
-                            <span class="p-tag" id="p-tag-1">New Feature</span>
-                            <span style="font-weight:700; font-size:0.75rem;">Analytics Hub</span>
-                            <span style="font-size:0.6rem; opacity:0.6;">Keep track of active leads.</span>
-                        </div>
-                        <div class="p-card" id="p-card-2">
-                            <span class="p-tag" id="p-tag-2">Stable</span>
-                            <span style="font-weight:700; font-size:0.75rem;">Integration</span>
-                            <span style="font-size:0.6rem; opacity:0.6;">Connect to cloud services.</span>
-                        </div>
+                    <div class="p-card" id="p-card-2">
+                        <span class="p-tag" id="p-tag-2">Stable</span>
+                        <span style="font-weight:700; font-size:0.75rem;">Integration</span>
+                        <span style="font-size:0.6rem; opacity:0.6;">Connect to cloud services.</span>
                     </div>
                 </div>
-            </section>
-
-            <!-- Saved Palettes Library list -->
-            <section style="flex:1;">
-                <h2 class="section-title">
-                    <span>Saved Library</span>
-                    <span id="saved-count">0 Palettes</span>
-                </h2>
-                <div class="saved-palettes-list" id="saved-palettes-list">
-                    <!-- Saved palettes are rendered here -->
-                    <div class="empty-saved">
-                        No saved palettes yet.<br>Click "Save" above to create one.
-                    </div>
-                </div>
-            </section>
-        </aside>
-    </main>
-
-    <!-- Export Modal Overlay -->
-    <div class="modal-overlay" id="export-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Export Palette</h2>
-                <button class="modal-close" id="modal-close-btn">&times;</button>
             </div>
-            <div class="modal-body">
-                <div class="export-options-list">
-                    <!-- CSS Variables -->
-                    <div class="export-format-block">
-                        <div class="export-format-header">
-                            <span class="export-format-title">CSS Variables</span>
-                            <button class="btn btn-icon-only" id="copy-css-btn" title="Copy to clipboard">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376A8.965 8.965 0 0012 12.75c-.497 0-.982.04-1.455.12l-.179.03m6.562 3.075L21 7.5m-6 6l-2.25-2.25M6.75 12.75a9.06 9.06 0 011.5.124M12 12.75c.497 0 .982-.04 1.455-.12l.179-.03m-5.112-9.043L12 3m0 0l2.25 2.25M12 3v9.75"/></svg>
-                            </button>
-                        </div>
-                        <pre class="export-code-panel" id="export-css-code"></pre>
-                    </div>
+        </section>
 
-                    <!-- Tailwind CSS config -->
-                    <div class="export-format-block">
-                        <div class="export-format-header">
-                            <span class="export-format-title">Tailwind CSS</span>
-                            <button class="btn btn-icon-only" id="copy-tailwind-btn" title="Copy to clipboard">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376A8.965 8.965 0 0012 12.75c-.497 0-.982.04-1.455.12l-.179.03m6.562 3.075L21 7.5m-6 6l-2.25-2.25M6.75 12.75a9.06 9.06 0 011.5.124M12 12.75c.497 0 .982-.04 1.455-.12l.179-.03m-5.112-9.043L12 3m0 0l2.25 2.25M12 3v9.75"/></svg>
-                            </button>
-                        </div>
-                        <pre class="export-code-panel" id="export-tailwind-code"></pre>
-                    </div>
+        <section style="flex:1;">
+            <h2 class="section-title">
+                <span>Saved Library</span>
+                <span id="saved-count">0 Palettes</span>
+            </h2>
+            <div class="saved-palettes-list" id="saved-palettes-list">
+                <div class="empty-saved">
+                    No saved palettes yet.<br>Click "Save" above to create one.
+                </div>
+            </div>
+        </section>
+    </aside>
+</main>
 
-                    <!-- JSON array -->
-                    <div class="export-format-block">
-                        <div class="export-format-header">
-                            <span class="export-format-title">JSON Array</span>
-                            <button class="btn btn-icon-only" id="copy-json-btn" title="Copy to clipboard">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376A8.965 8.965 0 0012 12.75c-.497 0-.982.04-1.455.12l-.179.03m6.562 3.075L21 7.5m-6 6l-2.25-2.25M6.75 12.75a9.06 9.06 0 011.5.124M12 12.75c.497 0 .982-.04 1.455-.12l.179-.03m-5.112-9.043L12 3m0 0l2.25 2.25M12 3v9.75"/></svg>
-                            </button>
-                        </div>
-                        <pre class="export-code-panel" id="export-json-code"></pre>
+<div class="modal-overlay" id="export-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Export Palette</h2>
+            <button class="modal-close" id="modal-close-btn">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="export-options-list">
+                <div class="export-format-block">
+                    <div class="export-format-header">
+                        <span class="export-format-title">CSS Variables</span>
+                        <button class="btn btn-icon-only" id="copy-css-btn" title="Copy to clipboard">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376A8.965 8.965 0 0012 12.75c-.497 0-.982.04-1.455.12l-.179.03m6.562 3.075L21 7.5m-6 6l-2.25-2.25M6.75 12.75a9.06 9.06 0 011.5.124M12 12.75c.497 0 .982-.04 1.455-.12l.179-.03m-5.112-9.043L12 3m0 0l2.25 2.25M12 3v9.75"/></svg>
+                        </button>
                     </div>
+                    <pre class="export-code-panel" id="export-css-code"></pre>
+                </div>
+
+                <div class="export-format-block">
+                    <div class="export-format-header">
+                        <span class="export-format-title">Tailwind CSS</span>
+                        <button class="btn btn-icon-only" id="copy-tailwind-btn" title="Copy to clipboard">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376A8.965 8.965 0 0012 12.75c-.497 0-.982.04-1.455.12l-.179.03m6.562 3.075L21 7.5m-6 6l-2.25-2.25M6.75 12.75a9.06 9.06 0 011.5.124M12 12.75c.497 0 .982-.04 1.455-.12l.179-.03m-5.112-9.043L12 3m0 0l2.25 2.25M12 3v9.75"/></svg>
+                        </button>
+                    </div>
+                    <pre class="export-code-panel" id="export-tailwind-code"></pre>
+                </div>
+
+                <div class="export-format-block">
+                    <div class="export-format-header">
+                        <span class="export-format-title">JSON Array</span>
+                        <button class="btn btn-icon-only" id="copy-json-btn" title="Copy to clipboard">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376A8.965 8.965 0 0012 12.75c-.497 0-.982.04-1.455.12l-.179.03m6.562 3.075L21 7.5m-6 6l-2.25-2.25M6.75 12.75a9.06 9.06 0 011.5.124M12 12.75c.497 0 .982-.04 1.455-.12l.179-.03m-5.112-9.043L12 3m0 0l2.25 2.25M12 3v9.75"/></svg>
+                        </button>
+                    </div>
+                    <pre class="export-code-panel" id="export-json-code"></pre>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Active Toast Notifications System -->
-    <div class="toast-container" id="toast-container"></div>
+<div class="toast-container" id="toast-container"></div>
 
 </body>
 </html>

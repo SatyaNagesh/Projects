@@ -5,16 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workspace Board — Premium Drag & Drop Board</title>
     <meta name="description" content="Organize your work with an ultra-premium, high-contrast desaturated Kanban Board. drag and drop task cards, check completion rates, and manage priorities seamlessly.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
 <body>
 
-    <!-- Main Header -->
-    <header>
+<div class="bg-curve" aria-hidden="true"></div>
+
+<header>
+    <div class="header-inner">
         <div class="brand-section">
             <div class="brand-logo">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                     <line x1="9" y1="3" x2="9" y2="21"/>
                     <line x1="15" y1="3" x2="15" y2="21"/>
@@ -27,7 +32,6 @@
             </div>
         </div>
 
-        <!-- Dynamic Statistics Bar -->
         <div class="board-stats-panel">
             <div class="stat-item">
                 <span class="stat-label">Project Done</span>
@@ -44,23 +48,22 @@
             </div>
             <div class="stat-item">
                 <span class="stat-label">High Priority</span>
-                <span class="stat-number" id="stats-high-priority" style="color: var(--priority-high);">0</span>
+                <span class="stat-number" id="stats-high-priority">0</span>
             </div>
         </div>
-    </header>
+    </div>
+</header>
 
-    <!-- Control Hub (Action Bar) -->
-    <section class="control-hub-bar">
+<section class="control-hub-bar">
+    <div class="control-inner">
         <div class="search-filter-group">
-            <!-- Search bar -->
             <div class="search-input-wrapper">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
                 <input type="text" id="board-search" class="search-field" placeholder="Search tasks by title or content...">
             </div>
 
-            <!-- Priority filter -->
             <div class="select-dropdown-wrapper">
                 <select id="priority-filter" class="filter-select" title="Filter by priority">
                     <option value="all">All Priorities</option>
@@ -71,189 +74,171 @@
             </div>
         </div>
 
-        <!-- Create Task trigger -->
         <button id="add-task-btn" class="btn btn-primary" title="Create a new task card">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
             </svg>
             <span>Create Task</span>
         </button>
-    </section>
+    </div>
+</section>
 
-    <!-- Kanban Columns Grid -->
-    <main class="kanban-board-container">
-        <div class="board-columns-grid">
-            <!-- Column 1: To Do -->
-            <section class="column-panel" data-column="todo">
-                <div class="column-header">
-                    <div class="column-title-box">
-                        <span class="column-indicator" style="color: var(--accent-indigo);"></span>
-                        <h2 class="column-title">To Do</h2>
-                    </div>
-                    <span class="column-card-counter" id="count-todo">0</span>
+<main class="kanban-board-container">
+    <div class="board-columns-grid">
+        <section class="column-panel" data-column="todo">
+            <div class="column-header">
+                <div class="column-title-box">
+                    <span class="column-indicator" style="background: var(--text-muted);"></span>
+                    <h2 class="column-title">To Do</h2>
                 </div>
-                <div class="cards-dropzone-wrapper" id="todo-dropzone">
-                    <!-- Cards injected here -->
-                </div>
-                <div class="quick-add-card-container">
-                    <button class="quick-add-trigger" data-column="todo">
-                        <span>+ Add Task</span>
-                    </button>
-                    <div class="quick-add-form">
-                        <input type="text" class="quick-add-input" placeholder="Task summary..." title="Enter task title">
-                        <div class="quick-add-actions">
-                            <button class="btn btn-mini quick-add-cancel-btn">Cancel</button>
-                            <button class="btn btn-primary btn-mini quick-add-save-btn">Add</button>
-                        </div>
+                <span class="column-card-counter" id="count-todo">0</span>
+            </div>
+            <div class="cards-dropzone-wrapper" id="todo-dropzone"></div>
+            <div class="quick-add-card-container">
+                <button class="quick-add-trigger" data-column="todo">
+                    <span>+ Add Task</span>
+                </button>
+                <div class="quick-add-form">
+                    <input type="text" class="quick-add-input" placeholder="Task summary..." title="Enter task title">
+                    <div class="quick-add-actions">
+                        <button class="btn btn-mini quick-add-cancel-btn">Cancel</button>
+                        <button class="btn btn-primary btn-mini quick-add-save-btn">Add</button>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Column 2: In Progress -->
-            <section class="column-panel" data-column="progress">
-                <div class="column-header">
-                    <div class="column-title-box">
-                        <span class="column-indicator" style="color: var(--priority-medium);"></span>
-                        <h2 class="column-title">In Progress</h2>
-                    </div>
-                    <span class="column-card-counter" id="count-progress">0</span>
+        <section class="column-panel" data-column="progress">
+            <div class="column-header">
+                <div class="column-title-box">
+                    <span class="column-indicator" style="background: var(--text-muted);"></span>
+                    <h2 class="column-title">In Progress</h2>
                 </div>
-                <div class="cards-dropzone-wrapper" id="progress-dropzone">
-                    <!-- Cards injected here -->
-                </div>
-                <div class="quick-add-card-container">
-                    <button class="quick-add-trigger" data-column="progress">
-                        <span>+ Add Task</span>
-                    </button>
-                    <div class="quick-add-form">
-                        <input type="text" class="quick-add-input" placeholder="Task summary..." title="Enter task title">
-                        <div class="quick-add-actions">
-                            <button class="btn btn-mini quick-add-cancel-btn">Cancel</button>
-                            <button class="btn btn-primary btn-mini quick-add-save-btn">Add</button>
-                        </div>
+                <span class="column-card-counter" id="count-progress">0</span>
+            </div>
+            <div class="cards-dropzone-wrapper" id="progress-dropzone"></div>
+            <div class="quick-add-card-container">
+                <button class="quick-add-trigger" data-column="progress">
+                    <span>+ Add Task</span>
+                </button>
+                <div class="quick-add-form">
+                    <input type="text" class="quick-add-input" placeholder="Task summary..." title="Enter task title">
+                    <div class="quick-add-actions">
+                        <button class="btn btn-mini quick-add-cancel-btn">Cancel</button>
+                        <button class="btn btn-primary btn-mini quick-add-save-btn">Add</button>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Column 3: In Review -->
-            <section class="column-panel" data-column="review">
-                <div class="column-header">
-                    <div class="column-title-box">
-                        <span class="column-indicator" style="color: var(--priority-high);"></span>
-                        <h2 class="column-title">In Review</h2>
-                    </div>
-                    <span class="column-card-counter" id="count-review">0</span>
+        <section class="column-panel" data-column="review">
+            <div class="column-header">
+                <div class="column-title-box">
+                    <span class="column-indicator" style="background: var(--text-muted);"></span>
+                    <h2 class="column-title">In Review</h2>
                 </div>
-                <div class="cards-dropzone-wrapper" id="review-dropzone">
-                    <!-- Cards injected here -->
-                </div>
-                <div class="quick-add-card-container">
-                    <button class="quick-add-trigger" data-column="review">
-                        <span>+ Add Task</span>
-                    </button>
-                    <div class="quick-add-form">
-                        <input type="text" class="quick-add-input" placeholder="Task summary..." title="Enter task title">
-                        <div class="quick-add-actions">
-                            <button class="btn btn-mini quick-add-cancel-btn">Cancel</button>
-                            <button class="btn btn-primary btn-mini quick-add-save-btn">Add</button>
-                        </div>
+                <span class="column-card-counter" id="count-review">0</span>
+            </div>
+            <div class="cards-dropzone-wrapper" id="review-dropzone"></div>
+            <div class="quick-add-card-container">
+                <button class="quick-add-trigger" data-column="review">
+                    <span>+ Add Task</span>
+                </button>
+                <div class="quick-add-form">
+                    <input type="text" class="quick-add-input" placeholder="Task summary..." title="Enter task title">
+                    <div class="quick-add-actions">
+                        <button class="btn btn-mini quick-add-cancel-btn">Cancel</button>
+                        <button class="btn btn-primary btn-mini quick-add-save-btn">Add</button>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Column 4: Done -->
-            <section class="column-panel" data-column="done">
-                <div class="column-header">
-                    <div class="column-title-box">
-                        <span class="column-indicator" style="color: var(--accent-done);"></span>
-                        <h2 class="column-title">Done</h2>
-                    </div>
-                    <span class="column-card-counter" id="count-done">0</span>
+        <section class="column-panel" data-column="done">
+            <div class="column-header">
+                <div class="column-title-box">
+                    <span class="column-indicator" style="background: var(--text-muted);"></span>
+                    <h2 class="column-title">Done</h2>
                 </div>
-                <div class="cards-dropzone-wrapper" id="done-dropzone">
-                    <!-- Cards injected here -->
-                </div>
-                <div class="quick-add-card-container">
-                    <button class="quick-add-trigger" data-column="done">
-                        <span>+ Add Task</span>
-                    </button>
-                    <div class="quick-add-form">
-                        <input type="text" class="quick-add-input" placeholder="Task summary..." title="Enter task title">
-                        <div class="quick-add-actions">
-                            <button class="btn btn-mini quick-add-cancel-btn">Cancel</button>
-                            <button class="btn btn-primary btn-mini quick-add-save-btn">Add</button>
-                        </div>
+                <span class="column-card-counter" id="count-done">0</span>
+            </div>
+            <div class="cards-dropzone-wrapper" id="done-dropzone"></div>
+            <div class="quick-add-card-container">
+                <button class="quick-add-trigger" data-column="done">
+                    <span>+ Add Task</span>
+                </button>
+                <div class="quick-add-form">
+                    <input type="text" class="quick-add-input" placeholder="Task summary..." title="Enter task title">
+                    <div class="quick-add-actions">
+                        <button class="btn btn-mini quick-add-cancel-btn">Cancel</button>
+                        <button class="btn btn-primary btn-mini quick-add-save-btn">Add</button>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
+    </div>
+</main>
+
+<div class="modal-overlay" id="task-modal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h2 id="modal-heading">Create New Task</h2>
+            <button class="modal-close-btn" id="modal-close-btn">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
         </div>
-    </main>
-
-    <!-- Task Editor Overlay Modal -->
-    <div class="modal-overlay" id="task-modal">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h2 id="modal-heading">Create New Task</h2>
-                <button class="modal-close-btn" id="modal-close-btn">&times;</button>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="task-title-field">Task Title</label>
+                <input type="text" id="task-title-field" class="form-input-field" placeholder="Enter task name...">
             </div>
-            <div class="modal-body">
-                <!-- Task title -->
-                <div class="form-group">
-                    <label for="task-title-field">Task Title</label>
-                    <input type="text" id="task-title-field" class="form-input-field" placeholder="Enter task name...">
-                </div>
 
-                <!-- Task description -->
-                <div class="form-group">
-                    <label for="task-desc-field">Description</label>
-                    <textarea id="task-desc-field" class="form-input-field" placeholder="Add specific task notes or instructions..."></textarea>
-                </div>
+            <div class="form-group">
+                <label for="task-desc-field">Description</label>
+                <textarea id="task-desc-field" class="form-input-field" placeholder="Add specific task notes or instructions..."></textarea>
+            </div>
 
-                <!-- Priority / Column settings -->
-                <div class="form-row-grid">
-                    <div class="form-group">
-                        <label for="task-priority-field">Priority</label>
-                        <div class="select-dropdown-wrapper">
-                            <select id="task-priority-field" class="form-select">
-                                <option value="low">Low</option>
-                                <option value="medium" selected>Medium</option>
-                                <option value="high">High</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="task-column-field">Column Stage</label>
-                        <div class="select-dropdown-wrapper">
-                            <select id="task-column-field" class="form-select">
-                                <option value="todo">To Do</option>
-                                <option value="progress">In Progress</option>
-                                <option value="review">In Review</option>
-                                <option value="done">Done</option>
-                            </select>
-                        </div>
+            <div class="form-row-grid">
+                <div class="form-group">
+                    <label for="task-priority-field">Priority</label>
+                    <div class="select-dropdown-wrapper">
+                        <select id="task-priority-field" class="form-select">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
                     </div>
                 </div>
-
-                <!-- Deadline picker -->
                 <div class="form-group">
-                    <label for="task-date-field">Due Date</label>
-                    <input type="date" id="task-date-field" class="form-input-field">
+                    <label for="task-column-field">Column Stage</label>
+                    <div class="select-dropdown-wrapper">
+                        <select id="task-column-field" class="form-select">
+                            <option value="todo">To Do</option>
+                            <option value="progress">In Progress</option>
+                            <option value="review">In Review</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <!-- Delete task action hidden in create mode -->
-                <button id="modal-delete-btn" class="btn" style="color: var(--priority-high); border-color: rgba(244, 63, 94, 0.1); display: none;">
-                    Delete Task
-                </button>
-                <button id="modal-save-btn" class="btn btn-primary" style="margin-left: auto;">
-                    Save Task
-                </button>
+
+            <div class="form-group">
+                <label for="task-date-field">Due Date</label>
+                <input type="date" id="task-date-field" class="form-input-field">
             </div>
+        </div>
+        <div class="modal-footer">
+            <button id="modal-delete-btn" class="btn btn-danger" style="display: none;">
+                Delete Task
+            </button>
+            <button id="modal-save-btn" class="btn btn-primary">
+                Save Task
+            </button>
         </div>
     </div>
+</div>
 
-    <!-- Active Toast notifications container -->
-    <div class="toast-container" id="toast-container"></div>
+<div class="toast-container" id="toast-container"></div>
 
 </body>
 </html>

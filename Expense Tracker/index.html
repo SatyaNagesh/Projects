@@ -4,18 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expense Tracker</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="app">
+<div class="bg-curve" aria-hidden="true"></div>
 
-        <header class="header">
+<div class="app">
+
+    <header class="header">
+        <div class="header-inner">
             <h1 class="logo">XPNS</h1>
             <p class="tagline">Track every penny</p>
-        </header>
+        </div>
+    </header>
+
+    <div class="content">
 
         <div class="balance-card">
             <p class="balance-label">Total Balance</p>
@@ -94,10 +101,13 @@
                     <li class="empty-state">No transactions yet. Add one above!</li>
                 </ul>
             </div>
+
         </div>
 
     </div>
 
-    <script src="script.js"></script>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
