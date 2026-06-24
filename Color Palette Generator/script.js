@@ -51,6 +51,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return hex;
     }
 
+    function generateVividHex() {
+        let hex = generateRandomHex();
+        const hsl = hexToHsl(hex);
+        if (hsl.s < 30) {
+            return hslToHex(hsl.h, 70, hsl.l);
+        }
+        return hex;
+    }
+
     function hexToRgb(hex) {
         let cleanHex = hex.replace('#', '');
         if (cleanHex.length === 3) {
@@ -153,74 +162,53 @@ document.addEventListener('DOMContentLoaded', () => {
     function calculateHarmonies(baseHex, type, count) {
         const baseHsl = hexToHsl(baseHex);
         const colorsList = [];
+        const safeS = Math.max(40, baseHsl.s);
+        const safeL = Math.max(25, Math.min(75, baseHsl.l));
 
         switch (type) {
             case 'complementary': {
+                const hues = [baseHsl.h, (baseHsl.h + 180) % 360];
                 for (let i = 0; i < count; i++) {
-                    let h = baseHsl.h;
-                    let s = baseHsl.s;
-                    let l = baseHsl.l;
-                    
-                    if (i > 0) {
-                        // Offset hue by 180 degrees
-                        h = (baseHsl.h + 180) % 360;
-                        // Vary lightness and saturation to look elegant
-                        if (i === 2) l = Math.max(10, baseHsl.l - 20);
-                        if (i === 3) l = Math.min(90, baseHsl.l + 25);
-                        if (i === 4) s = Math.max(10, baseHsl.s - 25);
-                    }
+                    const h = hues[i % 2];
+                    const s = Math.max(30, safeS - (i * 8));
+                    const l = Math.max(20, Math.min(80, safeL + (i < 2 ? 0 : (i === 2 ? -15 : i === 3 ? 15 : -25))));
                     colorsList.push(hslToHex(h, s, l));
                 }
                 break;
             }
             case 'analogous': {
-                const step = 20; // 20 degree wheel adjustments
+                const step = 25;
                 for (let i = 0; i < count; i++) {
-                    const offset = (i - Math.floor(count / 2)) * step;
+                    const offset = (i - Math.floor(count / 2)) * step + Math.round(Math.random() * 6 - 3);
                     const h = (baseHsl.h + offset + 360) % 360;
-                    colorsList.push(hslToHex(h, baseHsl.s, baseHsl.l));
+                    colorsList.push(hslToHex(h, safeS, safeL));
                 }
                 break;
             }
             case 'triadic': {
+                const hues = [baseHsl.h, (baseHsl.h + 120) % 360, (baseHsl.h + 240) % 360];
                 for (let i = 0; i < count; i++) {
-                    let h = baseHsl.h;
-                    let s = baseHsl.s;
-                    let l = baseHsl.l;
-                    
-                    if (i === 1 || i === 3) {
-                        h = (baseHsl.h + 120) % 360;
-                        if (i === 3) l = Math.max(15, baseHsl.l - 15);
-                    } else if (i === 2 || i === 4) {
-                        h = (baseHsl.h + 240) % 360;
-                        if (i === 4) s = Math.max(15, baseHsl.s - 15);
-                    }
+                    const h = hues[i % 3];
+                    const s = Math.max(30, safeS - (i * 5));
+                    const l = Math.max(20, Math.min(80, safeL + (i < 2 ? 0 : (i === 2 ? -15 : i === 3 ? 12 : -20))));
                     colorsList.push(hslToHex(h, s, l));
                 }
                 break;
             }
             case 'split': {
+                const hues = [baseHsl.h, (baseHsl.h + 150) % 360, (baseHsl.h + 210) % 360];
                 for (let i = 0; i < count; i++) {
-                    let h = baseHsl.h;
-                    let s = baseHsl.s;
-                    let l = baseHsl.l;
-                    
-                    if (i === 1 || i === 3) {
-                        h = (baseHsl.h + 150) % 360;
-                        if (i === 3) l = Math.min(90, baseHsl.l + 20);
-                    } else if (i === 2 || i === 4) {
-                        h = (baseHsl.h + 210) % 360;
-                        if (i === 4) s = Math.max(15, baseHsl.s - 20);
-                    }
+                    const h = hues[i % 3];
+                    const s = Math.max(30, safeS - (i * 5));
+                    const l = Math.max(20, Math.min(80, safeL + (i < 2 ? 0 : (i === 2 ? 18 : i === 3 ? -15 : -22))));
                     colorsList.push(hslToHex(h, s, l));
                 }
                 break;
             }
             case 'monochromatic': {
                 for (let i = 0; i < count; i++) {
-                    const stepL = 70 / count;
-                    const l = Math.round(15 + (i * stepL));
-                    const s = Math.min(100, Math.max(15, baseHsl.s - (i * 4)));
+                    const l = Math.round(15 + (i * (65 / Math.max(count - 1, 1))));
+                    const s = Math.max(30, safeS - (i * 6));
                     colorsList.push(hslToHex(baseHsl.h, s, l));
                 }
                 break;
@@ -257,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (firstLocked) {
             anchorHex = firstLocked.hex;
         } else {
-            anchorHex = generateRandomHex();
+            anchorHex = harmony === 'random' ? generateRandomHex() : generateVividHex();
         }
 
         const calculatedColors = calculateHarmonies(anchorHex, harmony, palette.length);
