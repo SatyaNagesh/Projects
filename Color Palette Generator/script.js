@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Core State Mutators ---
     function initializePalette() {
-        // Build 5 default starting colors
+        // Build 5 default starting colors using the selected harmony
         palette = [
             { hex: '#1E293B', locked: false, id: 'color-1' },
             { hex: '#4F46E5', locked: false, id: 'color-2' },
@@ -246,25 +246,22 @@ document.addEventListener('DOMContentLoaded', () => {
             { hex: '#10B981', locked: false, id: 'color-4' },
             { hex: '#F59E0B', locked: false, id: 'color-5' }
         ];
-        generatePalette(true); // Populate with beautiful defaults
+        generatePalette();
     }
 
-    function generatePalette(isInitial = false) {
+    function generatePalette() {
         const harmony = harmonySelector.value;
         
-        // Find anchor color (first locked, or first element if none locked)
-        let anchorHex = generateRandomHex();
+        let anchorHex;
         const firstLocked = palette.find(c => c.locked);
         if (firstLocked) {
             anchorHex = firstLocked.hex;
-        } else if (!isInitial && palette.length > 0) {
-            anchorHex = palette[0].hex;
+        } else {
+            anchorHex = generateRandomHex();
         }
 
-        // Calculate harmony colors
         const calculatedColors = calculateHarmonies(anchorHex, harmony, palette.length);
         
-        // Merge into active palette
         palette = palette.map((color, index) => {
             if (color.locked) return color;
             return {

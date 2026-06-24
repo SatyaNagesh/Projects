@@ -243,37 +243,28 @@ select:hover, select:focus {
 
 .palette-grid {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  padding: 20px;
   min-height: 400px;
-}
-
-@media (min-width: 768px) {
-  .palette-grid {
-    flex-direction: row;
-  }
+  align-content: start;
 }
 
 .color-card {
-  flex: 1;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   position: relative;
-  padding: 16px 20px;
-  transition: flex 0.3s ease, background-color 0.2s ease, opacity 0.3s ease;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.3s ease;
   overflow: hidden;
+  min-height: 240px;
 }
 
-@media (min-width: 768px) {
-  .color-card {
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 40px 12px 24px;
-    border-right: 1px solid rgba(0, 0, 0, 0.06);
-  }
+.color-card:hover {
+  border-color: var(--border-hover);
 }
 
 .color-card.dragging {
@@ -282,7 +273,8 @@ select:hover, select:focus {
 }
 
 .color-card.drag-over {
-  box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.15);
+  border-color: var(--text-muted);
+  box-shadow: 0 0 0 1px var(--text-muted);
 }
 
 .color-bg-trigger {
@@ -299,18 +291,10 @@ select:hover, select:focus {
   position: relative;
   z-index: 2;
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
   gap: 12px;
   width: 100%;
-}
-
-@media (min-width: 768px) {
-  .card-details {
-    flex-direction: column;
-    gap: 14px;
-    margin-top: auto;
-  }
+  margin-top: auto;
 }
 
 .hex-input-container {
@@ -321,7 +305,7 @@ select:hover, select:focus {
 
 .hex-hash {
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: 700;
   position: absolute;
   left: 8px;
@@ -334,11 +318,11 @@ select:hover, select:focus {
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: inherit;
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   letter-spacing: 0.3px;
-  width: 100px;
-  padding: 6px 6px 6px 24px;
+  width: 90px;
+  padding: 5px 5px 5px 22px;
   border-radius: var(--radius-sm);
   text-transform: uppercase;
   outline: none;
@@ -351,9 +335,9 @@ select:hover, select:focus {
 }
 
 .adjust-panel {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 10px;
   width: 180px;
@@ -362,12 +346,11 @@ select:hover, select:focus {
   gap: 8px;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(8px);
   transition: var(--transition);
   position: absolute;
   bottom: calc(100% + 8px);
   left: 50%;
-  transform: translateX(-50%) translateY(8px);
+  translate: -50% 8px;
   z-index: 5;
 }
 
@@ -375,20 +358,21 @@ select:hover, select:focus {
 .adjust-panel:focus-within {
   opacity: 1;
   pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
+  translate: -50% 0;
 }
 
 @media (max-width: 767px) {
   .adjust-panel {
-    left: auto;
-    right: 0;
-    bottom: 50px;
-    transform: translateY(8px);
     position: fixed;
+    bottom: auto;
+    top: 50%;
+    left: 50%;
+    translate: -50% 8px;
     width: 200px;
   }
-  .color-card:hover .adjust-panel {
-    transform: translateY(0);
+  .color-card:hover .adjust-panel,
+  .adjust-panel:focus-within {
+    translate: -50% -50%;
   }
 }
 
@@ -432,13 +416,7 @@ select:hover, select:focus {
   flex-direction: row;
   gap: 6px;
   align-items: center;
-}
-
-@media (min-width: 768px) {
-  .card-actions {
-    flex-direction: column;
-    gap: 8px;
-  }
+  justify-content: center;
 }
 
 .action-icon-btn {
@@ -476,10 +454,10 @@ select:hover, select:focus {
 
 .badge-contrast {
   font-family: var(--font-display);
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   font-weight: 600;
-  padding: 3px 6px;
-  border-radius: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
   background: rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.06);
   letter-spacing: 0.3px;
@@ -487,6 +465,7 @@ select:hover, select:focus {
   align-items: center;
   gap: 4px;
   backdrop-filter: blur(4px);
+  align-self: flex-start;
 }
 
 .shortcuts-hint {
