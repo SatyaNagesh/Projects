@@ -245,11 +245,11 @@ select:hover, select:focus {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  gap: 1px;
-  padding: 20px;
-  min-height: 300px;
+  gap: 2px;
+  padding: 12px;
+  min-height: 260px;
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid #333;
   border-radius: var(--radius);
   overflow: hidden;
 }
@@ -259,19 +259,19 @@ select:hover, select:focus {
   display: flex;
   flex-direction: column;
   position: relative;
-  padding: 16px;
-  transition: background-color 0.2s ease, opacity 0.3s ease;
+  padding: 14px;
+  transition: 200ms ease;
   overflow: hidden;
-  min-height: 260px;
-  border-right: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.color-card:last-child {
-  border-right: none;
+  min-height: 240px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .color-card:hover {
-  flex: 1.2;
+  transform: scale(1.03);
+  z-index: 2;
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 .color-card.dragging {
