@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   Search, Inbox, House, Ticket, AudioLines, Calendar,
   MessageCircle, BarChart3, Building2, Settings, CircleHelp,
   ChevronLeft, Filter, MoreHorizontal, Phone, MapPin,
   Paperclip, Smile, ImageIcon, Type, Send, Pencil,
-  ChevronDown, Pause, X, Circle, Loader2
+  ChevronDown, Pause, X, Circle, Loader2, Plus
 } from 'lucide-react'
 
 const agents = [
@@ -22,47 +22,9 @@ const agents = [
 ]
 
 type Session = { id: string; name: string; preview: string; unread: number }
-
-const sessionsByAgent: Record<string, Session[]> = {
-  'Claude Opus 4.8': [
-    { id: 'opus48-cora', name: 'Cora Goyette', preview: 'Hi, I want to ask something...', unread: 1 },
-    { id: 'opus48-john', name: 'John Smith', preview: 'Need help with API architecture', unread: 0 },
-  ],
-  'Claude Opus 4.7': [
-    { id: 'opus47-robert', name: 'Robert Chen', preview: 'Debugging production issue', unread: 2 },
-  ],
-  'Claude Opus 4.6': [
-    { id: 'opus46-mike', name: 'Mike Torres', preview: 'Multi-agent workflow design', unread: 1 },
-  ],
-  'Claude Sonnet 4.6': [
-    { id: 'sonnet46-darin', name: "Ms. Darin O'Keefe", preview: 'Hi, I want to ask something...', unread: 2 },
-    { id: 'sonnet46-irene', name: 'Irene Dicki', preview: 'Hi, I want to ask something...', unread: 0 },
-    { id: 'sonnet46-rosemary', name: 'Mr. Rosemary Koss', preview: 'Hi, I want to ask something...', unread: 0 },
-  ],
-  'Claude Sonnet 4.5': [
-    { id: 'sonnet45-emily', name: 'Emily Park', preview: 'Chat about subscription', unread: 1 },
-  ],
-  'Claude Haiku 4.5': [
-    { id: 'haiku45-alice', name: 'Alice Wang', preview: 'Quick question about...', unread: 3 },
-    { id: 'haiku45-tom', name: 'Tom Hudson', preview: 'Order status inquiry', unread: 0 },
-  ],
-  'GPT-5.5': [
-    { id: 'gpt55-alex', name: 'Alex Rivera', preview: 'Code review request', unread: 0 },
-  ],
-  'GPT-5.4': [
-    { id: 'gpt54-lisa', name: 'Lisa Chen', preview: 'General assistance needed', unread: 0 },
-  ],
-  'GPT-5.4 Mini': [
-    { id: 'gpt54mini-sam', name: 'Sam Wilson', preview: 'Quick question', unread: 1 },
-  ],
-  'Gemini 3.1 Pro': [
-    { id: 'gemini-pat', name: 'Dr. Patel', preview: 'Research data analysis', unread: 0 },
-  ],
-}
+type Message = { role: 'user' | 'assistant'; content: string }
 
 const API = `http://localhost:3456`
-
-type Message = { role: 'user' | 'assistant'; content: string }
 
 function IconSidebar() {
   const topIcons = [
@@ -151,12 +113,20 @@ function NavSidebar({ selectedAgent, onSelectAgent }: { selectedAgent: string; o
   )
 }
 
-function SessionList({ sessions, selectedSession, onSelectSession }: { sessions: Session[]; selectedSession: string; onSelectSession: (id: string) => void }) {
+function SessionList({ sessions, selectedSession, onSelectSession, onNewSession }: {
+  sessions: Session[]; selectedSession: string; onSelectSession: (id: string) => void; onNewSession: () => void
+}) {
   return (
     <div className="w-[300px] flex-shrink-0 bg-white border-r border-[#E5E7EB] flex flex-col">
-      <div className="flex items-center gap-2 px-4 h-14 border-b border-[#E5E7EB]">
-        <ChevronLeft size={18} className="text-[#6B7280]" />
-        <span className="text-sm font-semibold text-[#111827]">Sessions</span>
+      <div className="flex items-center justify-between px-4 h-14 border-b border-[#E5E7EB]">
+        <div className="flex items-center gap-2">
+          <ChevronLeft size={18} className="text-[#6B7280]" />
+          <span className="text-sm font-semibold text-[#111827]">Sessions</span>
+        </div>
+        <button onClick={onNewSession} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#111827] text-white rounded-lg text-xs font-medium hover:bg-[#1F2937]">
+          <Plus size={14} />
+          New Session
+        </button>
       </div>
       <div className="flex items-center gap-2 px-4 py-3 border-b border-[#E5E7EB]">
         <button className="flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E7EB] rounded-lg text-xs font-medium text-[#6B7280] hover:bg-[#F9FAFB]"><Filter size={14} />Filter</button>
@@ -164,10 +134,15 @@ function SessionList({ sessions, selectedSession, onSelectSession }: { sessions:
         <button className="flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E7EB] rounded-lg text-xs font-medium text-[#6B7280] hover:bg-[#F9FAFB]">Newest</button>
       </div>
       <div className="flex-1 overflow-y-auto">
+        {sessions.length === 0 && (
+          <div className="flex items-center justify-center h-full px-4">
+            <p className="text-sm text-[#9CA3AF] text-center">No sessions yet. Click "+ New Session" to start.</p>
+          </div>
+        )}
         {sessions.map((session) => (
           <div key={session.id} onClick={() => onSelectSession(session.id)} className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-[#F3F4F6] ${selectedSession === session.id ? 'bg-[#FAFAFA]' : 'hover:bg-[#FAFAFA]'}`}>
             <div className="w-9 h-9 rounded-full bg-[#E5E7EB] flex-shrink-0 flex items-center justify-center text-xs font-medium text-[#6B7280]">
-              {session.name.split(' ').slice(-2).map(s => s[0]).join('')}
+              {session.name === 'New Session' ? '?' : session.name.split(' ').slice(-2).map(s => s[0]).join('')}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between">
@@ -190,15 +165,19 @@ function SessionList({ sessions, selectedSession, onSelectSession }: { sessions:
   )
 }
 
-function Conversation({ sessionId, model, sessionName }: { sessionId: string; model: string; sessionName: string }) {
+function Conversation({ sessionId, model, sessionName, onFirstMessage }: {
+  sessionId: string; model: string; sessionName: string; onFirstMessage: (id: string, text: string) => void
+}) {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [hasNamed, setHasNamed] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!sessionId) return
     setMessages([])
+    setHasNamed(false)
     fetch(`${API}/session-messages?session=${sessionId}`)
       .then(r => r.json())
       .then(d => setMessages(d.messages || []))
@@ -214,6 +193,11 @@ function Conversation({ sessionId, model, sessionName }: { sessionId: string; mo
     const userMsg: Message = { role: 'user', content: text }
     setMessages(prev => [...prev, userMsg])
     setLoading(true)
+
+    if (!hasNamed && sessionName === 'New Session') {
+      setHasNamed(true)
+      onFirstMessage(sessionId, text)
+    }
 
     try {
       const res = await fetch(`${API}/v1/chat/completions`, {
@@ -258,7 +242,7 @@ function Conversation({ sessionId, model, sessionName }: { sessionId: string; mo
       <div className="flex items-center justify-between px-5 h-14 border-b border-[#E5E7EB]">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-[#E5E7EB] flex items-center justify-center text-xs font-medium text-[#6B7280]">
-            {sessionName.split(' ').slice(-2).map(s => s[0]).join('')}
+            {sessionName === 'New Session' ? '?' : sessionName.split(' ').slice(-2).map(s => s[0]).join('')}
           </div>
           <div>
             <p className="text-sm font-semibold text-[#111827]">{sessionName}</p>
@@ -274,7 +258,7 @@ function Conversation({ sessionId, model, sessionName }: { sessionId: string; mo
       <div className="flex-1 overflow-y-auto px-8 py-6 space-y-4">
         {messages.length === 0 && !loading && (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm text-[#9CA3AF]">Start a conversation with {sessionName}</p>
+            <p className="text-sm text-[#9CA3AF]">Ask {sessionName} anything...</p>
           </div>
         )}
         {messages.map((msg, i) => (
@@ -374,17 +358,50 @@ function InfoPanel() {
 
 export default function App() {
   const [selectedAgent, setSelectedAgent] = useState(agents[0].name)
-  const [selectedSession, setSelectedSession] = useState('opus48-cora')
+  const [sessionsByAgent, setSessionsByAgent] = useState<Record<string, Session[]>>(() => {
+    const initial: Record<string, Session[]> = {}
+    agents.forEach(a => { initial[a.name] = [] })
+    return initial
+  })
+  const [selectedSession, setSelectedSession] = useState('')
+
   const sessions = sessionsByAgent[selectedAgent] || []
   const agent = agents.find(a => a.name === selectedAgent)
   const session = sessions.find(s => s.id === selectedSession)
 
+  const handleNewSession = useCallback(() => {
+    const slug = selectedAgent.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 8)
+    const id = `${slug}-${Date.now()}`
+    const newSession: Session = { id, name: 'New Session', preview: '', unread: 0 }
+    setSessionsByAgent(prev => ({
+      ...prev,
+      [selectedAgent]: [newSession, ...(prev[selectedAgent] || [])],
+    }))
+    setSelectedSession(id)
+  }, [selectedAgent])
+
+  const handleFirstMessage = useCallback((sessionId: string, text: string) => {
+    const name = text.length > 40 ? text.slice(0, 40) + '...' : text
+    setSessionsByAgent(prev => ({
+      ...prev,
+      [selectedAgent]: (prev[selectedAgent] || []).map(s =>
+        s.id === sessionId ? { ...s, name, preview: text } : s
+      ),
+    }))
+  }, [selectedAgent])
+
   return (
     <div className="h-full flex bg-[#FAFAFA] font-['Inter',sans-serif]">
       <IconSidebar />
-      <NavSidebar selectedAgent={selectedAgent} onSelectAgent={setSelectedAgent} />
-      <SessionList sessions={sessions} selectedSession={selectedSession} onSelectSession={setSelectedSession} />
-      <Conversation sessionId={selectedSession} model={agent?.model || ''} sessionName={session?.name || ''} />
+      <NavSidebar selectedAgent={selectedAgent} onSelectAgent={(name) => { setSelectedAgent(name); setSelectedSession('') }} />
+      <SessionList sessions={sessions} selectedSession={selectedSession} onSelectSession={setSelectedSession} onNewSession={handleNewSession} />
+      {session ? (
+        <Conversation sessionId={session.id} model={agent?.model || ''} sessionName={session.name} onFirstMessage={handleFirstMessage} />
+      ) : (
+        <div className="flex-1 flex items-center justify-center bg-white">
+          <p className="text-sm text-[#9CA3AF]">Select a session or start a new one</p>
+        </div>
+      )}
       <InfoPanel />
     </div>
   )
