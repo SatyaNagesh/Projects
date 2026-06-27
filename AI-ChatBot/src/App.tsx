@@ -7,9 +7,17 @@ import {
 } from 'lucide-react'
 
 const agents = [
-  { name: 'Olivia Rhye', online: true },
-  { name: 'Alfredo Bayer', online: true },
-  { name: 'Brent Runner', online: false },
+  { name: 'Claude Opus 4.8', specialty: 'Architecture & Reasoning', online: true },
+  { name: 'Claude Opus 4.7', specialty: 'Complex Debugging', online: true },
+  { name: 'Claude Opus 4.6', specialty: 'Agentic Workflows', online: true },
+  { name: 'Claude Sonnet 4.6', specialty: 'Daily Driver — All Tasks', online: true },
+  { name: 'Claude Sonnet 4.5', specialty: 'Balanced Chat', online: true },
+  { name: 'Claude Haiku 4.5', specialty: 'Speed & High Volume', online: true },
+  { name: 'GPT-5.5', specialty: 'Code Generation', online: true },
+  { name: 'GPT-5.4', specialty: 'General Purpose', online: true },
+  { name: 'GPT-5.4 Mini', specialty: 'Lightweight Tasks', online: true },
+  { name: 'Gemini 3.1 Pro', specialty: 'Research & Analysis', online: true },
+  { name: 'Blackbox', specialty: 'Untested', online: false },
 ]
 
 const conversations = [
@@ -114,12 +122,12 @@ function NavSidebar() {
         {agents.map((agent, i) => (
           <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-[#F9FAFB]">
             <div className="relative">
-              <div className="w-7 h-7 rounded-full bg-[#E5E7EB] flex items-center justify-center text-xs font-medium text-[#6B7280]">{agent.name.split(' ').map(s => s[0]).join('')}</div>
+              <div className="w-7 h-7 rounded-full bg-[#E5E7EB] flex items-center justify-center text-xs font-medium text-[#6B7280]">{agent.name.split(' ').slice(-2).map(s => s[0]).join('')}</div>
               <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${agent.online ? 'bg-[#22C55E]' : 'bg-[#D1D5DB]'}`} />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm text-[#111827] truncate">{agent.name}</p>
-              <p className="text-xs text-[#6B7280]">{agent.online ? 'Online' : 'Offline'}</p>
+              <p className="text-xs text-[#6B7280] truncate">{agent.specialty}</p>
             </div>
           </div>
         ))}
