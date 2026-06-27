@@ -1,87 +1,79 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Search, Inbox, House, Ticket, AudioLines, Calendar,
   MessageCircle, BarChart3, Building2, Settings, CircleHelp,
   ChevronLeft, Filter, MoreHorizontal, Phone, MapPin,
   Paperclip, Smile, ImageIcon, Type, Send, Pencil,
-  ChevronDown, Pause, X, Circle
+  ChevronDown, Pause, X, Circle, Loader2
 } from 'lucide-react'
 
 const agents = [
-  { name: 'Claude Opus 4.8', specialty: 'Architecture & Reasoning', online: true },
-  { name: 'Claude Opus 4.7', specialty: 'Complex Debugging', online: true },
-  { name: 'Claude Opus 4.6', specialty: 'Agentic Workflows', online: true },
-  { name: 'Claude Sonnet 4.6', specialty: 'Daily Driver — All Tasks', online: true },
-  { name: 'Claude Sonnet 4.5', specialty: 'Balanced Chat', online: true },
-  { name: 'Claude Haiku 4.5', specialty: 'Speed & High Volume', online: true },
-  { name: 'GPT-5.5', specialty: 'Code Generation', online: true },
-  { name: 'GPT-5.4', specialty: 'General Purpose', online: true },
-  { name: 'GPT-5.4 Mini', specialty: 'Lightweight Tasks', online: true },
-  { name: 'Gemini 3.1 Pro', specialty: 'Research & Analysis', online: true },
-  { name: 'Blackbox', specialty: 'Untested', online: false },
+  { name: 'Claude Opus 4.8', model: 'claude-opus-4-8', specialty: 'Architecture & Reasoning', online: true },
+  { name: 'Claude Opus 4.7', model: 'claude-opus-4-7', specialty: 'Complex Debugging', online: true },
+  { name: 'Claude Opus 4.6', model: 'claude-opus-4-6', specialty: 'Agentic Workflows', online: true },
+  { name: 'Claude Sonnet 4.6', model: 'claude-sonnet-4-6', specialty: 'Daily Driver — All Tasks', online: true },
+  { name: 'Claude Sonnet 4.5', model: 'claude-sonnet-4-5-20250929', specialty: 'Balanced Chat', online: true },
+  { name: 'Claude Haiku 4.5', model: 'claude-haiku-4-5-20251001', specialty: 'Speed & High Volume', online: true },
+  { name: 'GPT-5.5', model: 'gpt-5.5', specialty: 'Code Generation', online: true },
+  { name: 'GPT-5.4', model: 'gpt-5.4', specialty: 'General Purpose', online: true },
+  { name: 'GPT-5.4 Mini', model: 'gpt-5.4-mini', specialty: 'Lightweight Tasks', online: true },
+  { name: 'Gemini 3.1 Pro', model: 'gemini-3.1-pro-preview', specialty: 'Research & Analysis', online: true },
+  { name: 'Blackbox', model: 'blackbox', specialty: 'Untested', online: false },
 ]
 
 type Session = { id: string; name: string; preview: string; unread: number }
 
 const sessionsByAgent: Record<string, Session[]> = {
   'Claude Opus 4.8': [
-    { id: '1', name: 'Cora Goyette', preview: 'Hi, I want to ask something...', unread: 1 },
-    { id: '2', name: 'John Smith', preview: 'Need help with API architecture', unread: 0 },
+    { id: 'opus48-cora', name: 'Cora Goyette', preview: 'Hi, I want to ask something...', unread: 1 },
+    { id: 'opus48-john', name: 'John Smith', preview: 'Need help with API architecture', unread: 0 },
   ],
   'Claude Opus 4.7': [
-    { id: '3', name: 'Robert Chen', preview: 'Debugging production issue', unread: 2 },
-    { id: '4', name: 'Sarah Lee', preview: 'Memory leak investigation', unread: 0 },
+    { id: 'opus47-robert', name: 'Robert Chen', preview: 'Debugging production issue', unread: 2 },
   ],
   'Claude Opus 4.6': [
-    { id: '5', name: 'Mike Torres', preview: 'Multi-agent workflow design', unread: 1 },
+    { id: 'opus46-mike', name: 'Mike Torres', preview: 'Multi-agent workflow design', unread: 1 },
   ],
   'Claude Sonnet 4.6': [
-    { id: '6', name: 'Ms. Darin O\'Keefe', preview: 'Hi, I want to ask something...', unread: 2 },
-    { id: '7', name: 'Irene Dicki', preview: 'Hi, I want to ask something...', unread: 0 },
-    { id: '8', name: 'Mr. Rosemary Koss', preview: 'Hi, I want to ask something...', unread: 0 },
+    { id: 'sonnet46-darin', name: "Ms. Darin O'Keefe", preview: 'Hi, I want to ask something...', unread: 2 },
+    { id: 'sonnet46-irene', name: 'Irene Dicki', preview: 'Hi, I want to ask something...', unread: 0 },
+    { id: 'sonnet46-rosemary', name: 'Mr. Rosemary Koss', preview: 'Hi, I want to ask something...', unread: 0 },
   ],
   'Claude Sonnet 4.5': [
-    { id: '9', name: 'Emily Park', preview: 'Chat about subscription', unread: 1 },
+    { id: 'sonnet45-emily', name: 'Emily Park', preview: 'Chat about subscription', unread: 1 },
   ],
   'Claude Haiku 4.5': [
-    { id: '10', name: 'Alice Wang', preview: 'Quick question about...', unread: 3 },
-    { id: '11', name: 'Tom Hudson', preview: 'Order status inquiry', unread: 0 },
+    { id: 'haiku45-alice', name: 'Alice Wang', preview: 'Quick question about...', unread: 3 },
+    { id: 'haiku45-tom', name: 'Tom Hudson', preview: 'Order status inquiry', unread: 0 },
   ],
   'GPT-5.5': [
-    { id: '12', name: 'Alex Rivera', preview: 'Code review request', unread: 0 },
+    { id: 'gpt55-alex', name: 'Alex Rivera', preview: 'Code review request', unread: 0 },
   ],
   'GPT-5.4': [
-    { id: '13', name: 'Lisa Chen', preview: 'General assistance needed', unread: 0 },
+    { id: 'gpt54-lisa', name: 'Lisa Chen', preview: 'General assistance needed', unread: 0 },
   ],
   'GPT-5.4 Mini': [
-    { id: '14', name: 'Sam Wilson', preview: 'Quick question', unread: 1 },
+    { id: 'gpt54mini-sam', name: 'Sam Wilson', preview: 'Quick question', unread: 1 },
   ],
   'Gemini 3.1 Pro': [
-    { id: '15', name: 'Dr. Patel', preview: 'Research data analysis', unread: 0 },
+    { id: 'gemini-pat', name: 'Dr. Patel', preview: 'Research data analysis', unread: 0 },
   ],
 }
 
-const activities = [
-  { name: 'Justin Hickle', time: 'Feb 23, 18:43', text: 'Send Sarah an update by email by 4PM tomorrow.' },
-  { name: 'Justin Hickle', time: 'Feb 23, 18:43', text: 'Send Sarah an update by email by 4PM tomorrow.' },
-  { name: 'Justin Hickle', time: 'Feb 23, 18:43', text: 'Send Sarah an update by email by 4PM tomorrow.' },
-]
+const API = `http://localhost:3456`
+
+type Message = { role: 'user' | 'assistant'; content: string }
 
 function IconSidebar() {
   const topIcons = [
-    { icon: Search, active: false },
-    { icon: Inbox, active: false },
-    { icon: House, active: false },
-    { icon: Ticket, active: false },
-    { icon: AudioLines, active: false },
-    { icon: Calendar, active: false },
-    { icon: MessageCircle, active: false },
-    { icon: BarChart3, active: true },
+    { icon: Search, active: false }, { icon: Inbox, active: false },
+    { icon: House, active: false }, { icon: Ticket, active: false },
+    { icon: AudioLines, active: false }, { icon: Calendar, active: false },
+    { icon: MessageCircle, active: false }, { icon: BarChart3, active: true },
     { icon: Building2, active: false },
   ]
   const bottomIcons = [
-    { icon: Settings, active: false },
-    { icon: CircleHelp, active: false },
+    { icon: Settings, active: false }, { icon: CircleHelp, active: false },
   ]
   return (
     <div className="w-[52px] flex-shrink-0 bg-white border-r border-[#ECECEC] flex flex-col items-center py-3 justify-between">
@@ -100,7 +92,7 @@ function IconSidebar() {
   )
 }
 
-function NavSidebar({ selectedAgent, onSelectAgent }: { selectedAgent: string; onSelectAgent: (name: string) => void }) {
+function NavSidebar({ selectedAgent, onSelectAgent }: { selectedAgent: string; onSelectAgent: (n: string) => void }) {
   return (
     <div className="w-[220px] flex-shrink-0 bg-white border-r border-[#E5E7EB] flex flex-col p-4 gap-5 overflow-y-auto">
       <div className="relative">
@@ -110,29 +102,21 @@ function NavSidebar({ selectedAgent, onSelectAgent }: { selectedAgent: string; o
       <div>
         <p className="text-[11px] font-semibold text-[#9CA3AF] tracking-wider mb-2">INBOX</p>
         {[
-          { label: 'All', count: 6 },
-          { label: 'Assigned to me', count: 6, selected: true },
-          { label: 'Unassigned', count: 6 },
+          { label: 'All', count: 6 }, { label: 'Assigned to me', count: 6, selected: true }, { label: 'Unassigned', count: 6 },
         ].map((item, i) => (
           <div key={i} className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm cursor-pointer ${item.selected ? 'bg-[#F3F4F6] text-[#111827] font-medium' : 'text-[#6B7280] hover:bg-[#F9FAFB]'}`}>
-            <span>{item.label}</span>
-            <span className="text-xs text-[#9CA3AF]">{item.count}</span>
+            <span>{item.label}</span><span className="text-xs text-[#9CA3AF]">{item.count}</span>
           </div>
         ))}
       </div>
       <div>
         <p className="text-[11px] font-semibold text-[#9CA3AF] tracking-wider mb-2">STATUS</p>
         {[
-          { label: 'All', count: 56, color: '#9CA3AF' },
-          { label: 'Agent', count: 123, color: '#2563EB' },
-          { label: 'Awaiting agent', count: 34, color: '#D97706' },
-          { label: 'Paused', count: 89, color: '#EAB308' },
+          { label: 'All', count: 56, color: '#9CA3AF' }, { label: 'Agent', count: 123, color: '#2563EB' },
+          { label: 'Awaiting agent', count: 34, color: '#D97706' }, { label: 'Paused', count: 89, color: '#EAB308' },
         ].map((item, i) => (
           <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg text-sm text-[#6B7280] cursor-pointer hover:bg-[#F9FAFB]">
-            <div className="flex items-center gap-2">
-              <Circle size={8} fill={item.color} stroke="none" />
-              <span>{item.label}</span>
-            </div>
+            <div className="flex items-center gap-2"><Circle size={8} fill={item.color} stroke="none" /><span>{item.label}</span></div>
             <span className="text-xs text-[#9CA3AF]">{item.count}</span>
           </div>
         ))}
@@ -140,26 +124,18 @@ function NavSidebar({ selectedAgent, onSelectAgent }: { selectedAgent: string; o
       <div>
         <p className="text-[11px] font-semibold text-[#9CA3AF] tracking-wider mb-2">CHANNEL</p>
         {[
-          { label: 'All', count: 56 },
-          { label: 'SMS', count: 123 },
-          { label: 'Whatsapp', count: 34 },
-          { label: 'Instagram', count: 89 },
-          { label: 'Web', count: 89 },
+          { label: 'All', count: 56 }, { label: 'SMS', count: 123 }, { label: 'Whatsapp', count: 34 },
+          { label: 'Instagram', count: 89 }, { label: 'Web', count: 89 },
         ].map((item, i) => (
           <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg text-sm text-[#6B7280] cursor-pointer hover:bg-[#F9FAFB]">
-            <span>{item.label}</span>
-            <span className="text-xs text-[#9CA3AF]">{item.count}</span>
+            <span>{item.label}</span><span className="text-xs text-[#9CA3AF]">{item.count}</span>
           </div>
         ))}
       </div>
       <div>
         <p className="text-[11px] font-semibold text-[#9CA3AF] tracking-wider mb-2">AGENTS</p>
         {agents.map((agent, i) => (
-          <div
-            key={i}
-            onClick={() => onSelectAgent(agent.name)}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer ${selectedAgent === agent.name ? 'bg-[#F3F4F6]' : 'hover:bg-[#F9FAFB]'}`}
-          >
+          <div key={i} onClick={() => onSelectAgent(agent.name)} className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer ${selectedAgent === agent.name ? 'bg-[#F3F4F6]' : 'hover:bg-[#F9FAFB]'}`}>
             <div className="relative">
               <div className="w-7 h-7 rounded-full bg-[#E5E7EB] flex items-center justify-center text-xs font-medium text-[#6B7280]">{agent.name.split(' ').slice(-2).map(s => s[0]).join('')}</div>
               <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${agent.online ? 'bg-[#22C55E]' : 'bg-[#D1D5DB]'}`} />
@@ -183,20 +159,13 @@ function SessionList({ sessions, selectedSession, onSelectSession }: { sessions:
         <span className="text-sm font-semibold text-[#111827]">Sessions</span>
       </div>
       <div className="flex items-center gap-2 px-4 py-3 border-b border-[#E5E7EB]">
-        <button className="flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E7EB] rounded-lg text-xs font-medium text-[#6B7280] hover:bg-[#F9FAFB]">
-          <Filter size={14} />
-          Filter
-        </button>
+        <button className="flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E7EB] rounded-lg text-xs font-medium text-[#6B7280] hover:bg-[#F9FAFB]"><Filter size={14} />Filter</button>
         <button className="flex items-center gap-1.5 px-3 py-1.5 border border-[#2878D9] rounded-lg text-xs font-medium text-[#2878D9]">Open</button>
         <button className="flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E7EB] rounded-lg text-xs font-medium text-[#6B7280] hover:bg-[#F9FAFB]">Newest</button>
       </div>
       <div className="flex-1 overflow-y-auto">
         {sessions.map((session) => (
-          <div
-            key={session.id}
-            onClick={() => onSelectSession(session.id)}
-            className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-[#F3F4F6] ${selectedSession === session.id ? 'bg-[#FAFAFA]' : 'hover:bg-[#FAFAFA]'}`}
-          >
+          <div key={session.id} onClick={() => onSelectSession(session.id)} className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-[#F3F4F6] ${selectedSession === session.id ? 'bg-[#FAFAFA]' : 'hover:bg-[#FAFAFA]'}`}>
             <div className="w-9 h-9 rounded-full bg-[#E5E7EB] flex-shrink-0 flex items-center justify-center text-xs font-medium text-[#6B7280]">
               {session.name.split(' ').slice(-2).map(s => s[0]).join('')}
             </div>
@@ -221,76 +190,111 @@ function SessionList({ sessions, selectedSession, onSelectSession }: { sessions:
   )
 }
 
-function Conversation() {
+function Conversation({ sessionId, model, sessionName }: { sessionId: string; model: string; sessionName: string }) {
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+  const bottomRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!sessionId) return
+    setMessages([])
+    fetch(`${API}/session-messages?session=${sessionId}`)
+      .then(r => r.json())
+      .then(d => setMessages(d.messages || []))
+      .catch(() => {})
+  }, [sessionId])
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
+
+  async function handleSend() {
+    const text = input.trim()
+    if (!text || loading) return
+    setInput('')
+    const userMsg: Message = { role: 'user', content: text }
+    setMessages(prev => [...prev, userMsg])
+    setLoading(true)
+
+    try {
+      const res = await fetch(`${API}/v1/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session: sessionId, messages: [userMsg], model, stream: true }),
+      })
+      if (!res.ok) {
+        setMessages(prev => [...prev, { role: 'assistant', content: 'Error: request failed' }])
+        setLoading(false)
+        return
+      }
+      const reader = res.body!.getReader()
+      const decoder = new TextDecoder()
+      let reply = ''
+      setMessages(prev => [...prev, { role: 'assistant', content: '' }])
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const chunk = decoder.decode(value, { stream: true })
+        const lines = chunk.split('\n').filter(l => l.startsWith('data: ') && l !== 'data: [DONE]')
+        for (const line of lines) {
+          try {
+            const delta = JSON.parse(line.slice(6)).choices?.[0]?.delta?.content || ''
+            reply += delta
+            setMessages(prev => {
+              const copy = [...prev]
+              copy[copy.length - 1] = { role: 'assistant', content: reply }
+              return copy
+            })
+          } catch {}
+        }
+      }
+    } catch {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Error: connection failed' }])
+    }
+    setLoading(false)
+  }
+
   return (
     <div className="flex-1 flex flex-col bg-white min-w-0">
       <div className="flex items-center justify-between px-5 h-14 border-b border-[#E5E7EB]">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-[#E5E7EB] flex items-center justify-center text-xs font-medium text-[#6B7280]">CG</div>
+          <div className="w-9 h-9 rounded-full bg-[#E5E7EB] flex items-center justify-center text-xs font-medium text-[#6B7280]">
+            {sessionName.split(' ').slice(-2).map(s => s[0]).join('')}
+          </div>
           <div>
-            <p className="text-sm font-semibold text-[#111827]">Cora Goyette</p>
+            <p className="text-sm font-semibold text-[#111827]">{sessionName}</p>
             <p className="text-xs text-[#22C55E]">Online</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E7EB] rounded-lg text-xs font-medium text-[#6B7280] hover:bg-[#F9FAFB]">
-            <Pause size={14} />
-            Pause
-          </button>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 bg-[#111827] text-white rounded-lg text-xs font-medium hover:bg-[#1F2937]">
-            <X size={14} />
-            Close
-          </button>
+          <button className="flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E7EB] rounded-lg text-xs font-medium text-[#6B7280] hover:bg-[#F9FAFB]"><Pause size={14} />Pause</button>
+          <button className="flex items-center gap-1.5 px-3 py-1.5 bg-[#111827] text-white rounded-lg text-xs font-medium hover:bg-[#1F2937]"><X size={14} />Close</button>
           <ChevronDown size={16} className="text-[#6B7280]" />
         </div>
       </div>
       <div className="flex-1 overflow-y-auto px-8 py-6 space-y-4">
-        <div className="max-w-[400px] ml-auto">
-          <div className="bg-[#2878D9] text-white rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-line">
-            Thank you.<br /><br />Please enter the amount and date of the transaction<br /><br />(eg 100, December 21th).
+        {messages.length === 0 && !loading && (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-sm text-[#9CA3AF]">Start a conversation with {sessionName}</p>
           </div>
-          <p className="text-xs text-[#9CA3AF] text-right mt-1">13:34</p>
-        </div>
-        <div className="max-w-[400px] mr-auto">
-          <div className="bg-[#F5F5F5] text-[#111827] rounded-2xl px-4 py-3 text-sm leading-relaxed">
-            Okay, the amount is $500 and the date is December 21th 2023.
-          </div>
-          <p className="text-xs text-[#9CA3AF] mt-1">13:35</p>
-        </div>
-        <div className="max-w-[400px] ml-auto">
-          <div className="bg-[#2878D9] text-white rounded-2xl px-4 py-3 text-sm leading-relaxed">
-            Thank you for the information.
-          </div>
-          <p className="text-xs text-[#9CA3AF] text-right mt-1">13:36</p>
-        </div>
-        <div className="max-w-[400px] ml-auto space-y-2">
-          <button className="w-full px-4 py-2.5 border border-[#2878D9] text-[#2878D9] rounded-lg text-sm font-medium hover:bg-[#F0F7FF]">
-            Retry Checking the Balance
-          </button>
-          <button className="w-full px-4 py-2.5 border border-[#2878D9] text-[#2878D9] rounded-lg text-sm font-medium hover:bg-[#F0F7FF]">
-            Speak to a Representative
-          </button>
-        </div>
-        <div className="flex justify-center">
-          <div className="inline-flex items-center px-4 py-1.5 bg-[#F0F7FF] rounded-full text-xs text-[#6B7280]">
-            Chat got taken over by customer service
-          </div>
-        </div>
-        <div className="max-w-[400px] ml-auto">
-          <div className="flex items-start gap-2">
-            <div className="w-6 h-6 rounded-full bg-[#2563EB] flex-shrink-0 mt-2 flex items-center justify-center text-[10px] font-medium text-white">A</div>
-            <div className="flex-1">
-              <div className="bg-[#2878D9] text-white rounded-2xl px-4 py-3 text-sm leading-relaxed">
-                Hi, this is Alex from Customer Support.<br /><br />I see you're having an issue with your top-up.
-              </div>
-              <p className="text-xs text-[#9CA3AF] mt-1">13:38</p>
+        )}
+        {messages.map((msg, i) => (
+          <div key={i} className={`max-w-[400px] ${msg.role === 'user' ? 'ml-auto' : 'mr-auto'}`}>
+            <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user' ? 'bg-[#2878D9] text-white' : 'bg-[#F5F5F5] text-[#111827]'}`}>
+              {msg.content || (msg.role === 'assistant' && loading && i === messages.length - 1 ? <span className="inline-flex gap-1"><span className="w-1.5 h-1.5 bg-[#6B7280] rounded-full animate-bounce" style={{animationDelay:'0ms'}} /><span className="w-1.5 h-1.5 bg-[#6B7280] rounded-full animate-bounce" style={{animationDelay:'150ms'}} /><span className="w-1.5 h-1.5 bg-[#6B7280] rounded-full animate-bounce" style={{animationDelay:'300ms'}} /></span> : '')}
             </div>
           </div>
-        </div>
+        ))}
+        <div ref={bottomRef} />
       </div>
       <div className="border-t border-[#E5E7EB] px-5 py-4">
         <div className="bg-white border border-[#E5E7EB] rounded-xl">
-          <textarea className="w-full resize-none outline-none text-sm text-[#111827] placeholder:text-[#9CA3AF] px-4 pt-3 h-20" placeholder='Type "/" to use template message' />
+          <textarea
+            className="w-full resize-none outline-none text-sm text-[#111827] placeholder:text-[#9CA3AF] px-4 pt-3 h-20"
+            placeholder='Type "/" to use template message'
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
+          />
           <div className="flex items-center justify-between px-3 pb-3">
             <div className="flex items-center gap-2">
               <Paperclip size={16} className="text-[#9CA3AF] cursor-pointer hover:text-[#6B7280]" />
@@ -300,9 +304,9 @@ function Conversation() {
             </div>
             <div className="flex items-center gap-2">
               <button className="px-3 py-1.5 border border-[#E5E7EB] rounded-lg text-xs font-medium text-[#6B7280] hover:bg-[#F9FAFB]">Assign to Form</button>
-              <button className="flex items-center gap-1.5 px-4 py-1.5 bg-[#D97706] text-white rounded-lg text-xs font-medium hover:bg-[#B45309]">
-                Send
-                <Send size={14} />
+              <button onClick={handleSend} disabled={loading} className="flex items-center gap-1.5 px-4 py-1.5 bg-[#D97706] text-white rounded-lg text-xs font-medium hover:bg-[#B45309] disabled:opacity-50">
+                {loading ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+                {loading ? 'Sending...' : 'Send'}
               </button>
             </div>
           </div>
@@ -352,18 +356,13 @@ function InfoPanel() {
       <div className="px-5 py-4 flex-1">
         <p className="text-xs font-semibold text-[#9CA3AF] tracking-wider mb-3">ACTIVITY</p>
         <div className="space-y-4">
-          {activities.map((a, i) => (
+          {[{n:'Justin Hickle',t:'Feb 23, 18:43',s:'Send Sarah an update by email by 4PM tomorrow.'},{n:'Justin Hickle',t:'Feb 23, 18:43',s:'Send Sarah an update by email by 4PM tomorrow.'},{n:'Justin Hickle',t:'Feb 23, 18:43',s:'Send Sarah an update by email by 4PM tomorrow.'}].map((a, i) => (
             <div key={i} className="flex gap-3">
-              <div className="w-7 h-7 rounded-full bg-[#E5E7EB] flex-shrink-0 mt-0.5 flex items-center justify-center text-[10px] font-medium text-[#6B7280]">
-                {a.name.split(' ').map(s => s[0]).join('')}
-              </div>
+              <div className="w-7 h-7 rounded-full bg-[#E5E7EB] flex-shrink-0 mt-0.5 flex items-center justify-center text-[10px] font-medium text-[#6B7280]">{a.n.split(' ').map(s => s[0]).join('')}</div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-medium text-[#111827]">{a.name}</p>
-                  <MoreHorizontal size={12} className="text-[#9CA3AF] flex-shrink-0" />
-                </div>
-                <p className="text-xs text-[#9CA3AF]">{a.time}</p>
-                <p className="text-xs text-[#6B7280] mt-1">{a.text}</p>
+                <div className="flex items-center justify-between"><p className="text-xs font-medium text-[#111827]">{a.n}</p><MoreHorizontal size={12} className="text-[#9CA3AF] flex-shrink-0" /></div>
+                <p className="text-xs text-[#9CA3AF]">{a.t}</p>
+                <p className="text-xs text-[#6B7280] mt-1">{a.s}</p>
               </div>
             </div>
           ))}
@@ -375,15 +374,17 @@ function InfoPanel() {
 
 export default function App() {
   const [selectedAgent, setSelectedAgent] = useState(agents[0].name)
-  const [selectedSession, setSelectedSession] = useState('1')
+  const [selectedSession, setSelectedSession] = useState('opus48-cora')
   const sessions = sessionsByAgent[selectedAgent] || []
+  const agent = agents.find(a => a.name === selectedAgent)
+  const session = sessions.find(s => s.id === selectedSession)
 
   return (
     <div className="h-full flex bg-[#FAFAFA] font-['Inter',sans-serif]">
       <IconSidebar />
       <NavSidebar selectedAgent={selectedAgent} onSelectAgent={setSelectedAgent} />
       <SessionList sessions={sessions} selectedSession={selectedSession} onSelectSession={setSelectedSession} />
-      <Conversation />
+      <Conversation sessionId={selectedSession} model={agent?.model || ''} sessionName={session?.name || ''} />
       <InfoPanel />
     </div>
   )
