@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   Search, Inbox, House, Ticket, AudioLines, Calendar,
   MessageCircle, BarChart3, Building2, Settings, CircleHelp,
@@ -20,11 +21,45 @@ const agents = [
   { name: 'Blackbox', specialty: 'Untested', online: false },
 ]
 
-const conversations = [
-  { name: 'Mr. Rosemary Koss', preview: 'Hi, I want to ask something...', unread: 1, active: true },
-  { name: 'Ms. Darin O\'Keefe', preview: 'Hi, I want to ask something...', unread: 0, active: false },
-  { name: 'Irene Dicki', preview: 'Hi, I want to ask something...', unread: 0, active: false },
-]
+type Session = { id: string; name: string; preview: string; unread: number }
+
+const sessionsByAgent: Record<string, Session[]> = {
+  'Claude Opus 4.8': [
+    { id: '1', name: 'Cora Goyette', preview: 'Hi, I want to ask something...', unread: 1 },
+    { id: '2', name: 'John Smith', preview: 'Need help with API architecture', unread: 0 },
+  ],
+  'Claude Opus 4.7': [
+    { id: '3', name: 'Robert Chen', preview: 'Debugging production issue', unread: 2 },
+    { id: '4', name: 'Sarah Lee', preview: 'Memory leak investigation', unread: 0 },
+  ],
+  'Claude Opus 4.6': [
+    { id: '5', name: 'Mike Torres', preview: 'Multi-agent workflow design', unread: 1 },
+  ],
+  'Claude Sonnet 4.6': [
+    { id: '6', name: 'Ms. Darin O\'Keefe', preview: 'Hi, I want to ask something...', unread: 2 },
+    { id: '7', name: 'Irene Dicki', preview: 'Hi, I want to ask something...', unread: 0 },
+    { id: '8', name: 'Mr. Rosemary Koss', preview: 'Hi, I want to ask something...', unread: 0 },
+  ],
+  'Claude Sonnet 4.5': [
+    { id: '9', name: 'Emily Park', preview: 'Chat about subscription', unread: 1 },
+  ],
+  'Claude Haiku 4.5': [
+    { id: '10', name: 'Alice Wang', preview: 'Quick question about...', unread: 3 },
+    { id: '11', name: 'Tom Hudson', preview: 'Order status inquiry', unread: 0 },
+  ],
+  'GPT-5.5': [
+    { id: '12', name: 'Alex Rivera', preview: 'Code review request', unread: 0 },
+  ],
+  'GPT-5.4': [
+    { id: '13', name: 'Lisa Chen', preview: 'General assistance needed', unread: 0 },
+  ],
+  'GPT-5.4 Mini': [
+    { id: '14', name: 'Sam Wilson', preview: 'Quick question', unread: 1 },
+  ],
+  'Gemini 3.1 Pro': [
+    { id: '15', name: 'Dr. Patel', preview: 'Research data analysis', unread: 0 },
+  ],
+}
 
 const activities = [
   { name: 'Justin Hickle', time: 'Feb 23, 18:43', text: 'Send Sarah an update by email by 4PM tomorrow.' },
@@ -65,7 +100,7 @@ function IconSidebar() {
   )
 }
 
-function NavSidebar() {
+function NavSidebar({ selectedAgent, onSelectAgent }: { selectedAgent: string; onSelectAgent: (name: string) => void }) {
   return (
     <div className="w-[220px] flex-shrink-0 bg-white border-r border-[#E5E7EB] flex flex-col p-4 gap-5 overflow-y-auto">
       <div className="relative">
@@ -120,7 +155,11 @@ function NavSidebar() {
       <div>
         <p className="text-[11px] font-semibold text-[#9CA3AF] tracking-wider mb-2">AGENTS</p>
         {agents.map((agent, i) => (
-          <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-[#F9FAFB]">
+          <div
+            key={i}
+            onClick={() => onSelectAgent(agent.name)}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer ${selectedAgent === agent.name ? 'bg-[#F3F4F6]' : 'hover:bg-[#F9FAFB]'}`}
+          >
             <div className="relative">
               <div className="w-7 h-7 rounded-full bg-[#E5E7EB] flex items-center justify-center text-xs font-medium text-[#6B7280]">{agent.name.split(' ').slice(-2).map(s => s[0]).join('')}</div>
               <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${agent.online ? 'bg-[#22C55E]' : 'bg-[#D1D5DB]'}`} />
@@ -136,12 +175,12 @@ function NavSidebar() {
   )
 }
 
-function ChatList() {
+function SessionList({ sessions, selectedSession, onSelectSession }: { sessions: Session[]; selectedSession: string; onSelectSession: (id: string) => void }) {
   return (
     <div className="w-[300px] flex-shrink-0 bg-white border-r border-[#E5E7EB] flex flex-col">
       <div className="flex items-center gap-2 px-4 h-14 border-b border-[#E5E7EB]">
         <ChevronLeft size={18} className="text-[#6B7280]" />
-        <span className="text-sm font-semibold text-[#111827]">Customer</span>
+        <span className="text-sm font-semibold text-[#111827]">Sessions</span>
       </div>
       <div className="flex items-center gap-2 px-4 py-3 border-b border-[#E5E7EB]">
         <button className="flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E7EB] rounded-lg text-xs font-medium text-[#6B7280] hover:bg-[#F9FAFB]">
@@ -152,21 +191,25 @@ function ChatList() {
         <button className="flex items-center gap-1.5 px-3 py-1.5 border border-[#E5E7EB] rounded-lg text-xs font-medium text-[#6B7280] hover:bg-[#F9FAFB]">Newest</button>
       </div>
       <div className="flex-1 overflow-y-auto">
-        {conversations.map((conv, i) => (
-          <div key={i} className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-[#F3F4F6] ${conv.active ? 'bg-[#FAFAFA]' : 'hover:bg-[#FAFAFA]'}`}>
+        {sessions.map((session) => (
+          <div
+            key={session.id}
+            onClick={() => onSelectSession(session.id)}
+            className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-[#F3F4F6] ${selectedSession === session.id ? 'bg-[#FAFAFA]' : 'hover:bg-[#FAFAFA]'}`}
+          >
             <div className="w-9 h-9 rounded-full bg-[#E5E7EB] flex-shrink-0 flex items-center justify-center text-xs font-medium text-[#6B7280]">
-              {conv.name.split(' ').slice(-2).map(s => s[0]).join('')}
+              {session.name.split(' ').slice(-2).map(s => s[0]).join('')}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-[#111827] truncate">{conv.name}</p>
+                <p className="text-sm font-medium text-[#111827] truncate">{session.name}</p>
                 <MoreHorizontal size={14} className="text-[#9CA3AF] flex-shrink-0 ml-2" />
               </div>
               <div className="flex items-center justify-between mt-0.5">
-                <p className="text-xs text-[#6B7280] truncate">{conv.preview}</p>
-                {conv.unread > 0 && (
+                <p className="text-xs text-[#6B7280] truncate">{session.preview}</p>
+                {session.unread > 0 && (
                   <div className="w-4 h-4 rounded bg-[#D97706] flex items-center justify-center flex-shrink-0 ml-2">
-                    <span className="text-[10px] font-bold text-white">{conv.unread}</span>
+                    <span className="text-[10px] font-bold text-white">{session.unread}</span>
                   </div>
                 )}
               </div>
@@ -331,11 +374,15 @@ function InfoPanel() {
 }
 
 export default function App() {
+  const [selectedAgent, setSelectedAgent] = useState(agents[0].name)
+  const [selectedSession, setSelectedSession] = useState('1')
+  const sessions = sessionsByAgent[selectedAgent] || []
+
   return (
     <div className="h-full flex bg-[#FAFAFA] font-['Inter',sans-serif]">
       <IconSidebar />
-      <NavSidebar />
-      <ChatList />
+      <NavSidebar selectedAgent={selectedAgent} onSelectAgent={setSelectedAgent} />
+      <SessionList sessions={sessions} selectedSession={selectedSession} onSelectSession={setSelectedSession} />
       <Conversation />
       <InfoPanel />
     </div>
